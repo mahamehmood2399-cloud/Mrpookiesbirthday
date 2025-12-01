@@ -82,7 +82,7 @@ body {
 
 <div class="page" id="page1">
   <h1>Day 1–5 🎁</h1>
-  <p>Let's start with a gift choice 🥳</p>
+  <p>Good morning! Let's start with a gift choice 🥳</p>
   <div class="reveal">
     <button class="choice" onclick="saveAnswer(1,'gift','Gift Box');showTease('Gift Box')">🎁 Gift Box</button>
     <button class="choice" onclick="saveAnswer(1,'gift','Gift Card');showTease('Gift Card')">💳 Gift Card</button>
@@ -159,7 +159,7 @@ let answers = JSON.parse(localStorage.getItem('pookie_answers')||'{}');
 // Nicknames for teasing
 const nicknames = [
   'Beef Steak 🥩','Rafaello 🍬','Cadbury 🍫','Full Course Meal 🍽️','Mr. Buttery 🧈',
-  'Sexy 😉','Sexy Pookie 😘','Pookie Vampire 🧛','Hot & Spicy Meal 🌶️','Perfect Dessert 🍰'
+  'Sexy 😏','Sexy Pookie 😘','Pookie Vampire 🧛','Hot & Spicy Meal 🌶️','Perfect Dessert 🍰'
 ];
 
 // Save answer
@@ -183,7 +183,214 @@ function showTease(text){
   const el=document.getElementById(teaseId);
   if(el){
     const randomNick=nicknames[Math.floor(Math.random()*nicknames.length)];
-    const funEmojis=['💖','😉','🥳','✨','😍','😎','🎉','💫'];
+    const funEmojis=['💖','😏','🥳','✨','😍','😎','🎉','💫'];
+    const randomEmoji=funEmojis[Math.floor(Math.random()*funEmojis.length)];
+    el.textContent=`${randomEmoji} Hey ${randomNick}! ${text} ${randomEmoji}`;
+  }
+}
+
+// Export answers
+function exportAnswers(){
+  const data=JSON.stringify(answers,null,2);
+  const blob=new Blob([data],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;
+  a.download='pookie_answers.json';
+  a.click();
+  a.remove();
+}
+
+// Init
+nextPage(0);
+</script>
+</body>
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pookie Cookie — Magical Birthday Countdown</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&display=swap');
+
+:root{
+  --bg:#f0f8ff;
+  --primary:#1e3a8a;
+  --accent:#60a5fa;
+  --muted:#333;
+  --gold:#ffd700;
+}
+
+body {
+  margin:0;
+  height:100%;
+  font-family:'Inter',sans-serif;
+  background: linear-gradient(135deg,#e0f2fe,#bae6fd);
+  color: var(--muted);
+  overflow: hidden;
+}
+
+.wrap {
+  max-width:800px;
+  margin:0 auto;
+  padding:24px;
+  height:100vh;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  position:relative;
+}
+
+.page {
+  background:white;
+  border-radius:20px;
+  padding:30px;
+  box-shadow:0 10px 30px rgba(0,0,0,0.2);
+  text-align:center;
+  width:100%;
+  max-width:600px;
+  display:none;
+  flex-direction:column;
+  animation:fadeIn 0.5s ease forwards;
+}
+
+.page.active { display:flex; }
+
+.page h1 { color: var(--primary); font-size:1.8rem; margin-bottom:10px; }
+.page p { font-size:1.1rem; margin:10px 0; }
+.page .riddle { font-style:italic; color:#555; margin:15px 0; }
+.page .reveal { display:flex; flex-wrap:wrap; gap:12px; justify-content:center; margin-top:15px; }
+.page button.choice {
+  background:var(--accent); color:white; border:none; padding:12px 20px; border-radius:12px;
+  cursor:pointer; font-weight:700; font-size:1rem; transition:all 0.2s ease;
+  display:flex; align-items:center; justify-content:center; gap:6px;
+}
+.page button.choice:hover { transform:scale(1.05) rotate(-1deg); box-shadow:0 6px 18px rgba(30,58,138,0.6);}
+.page .tease { margin-top:12px; font-weight:700; font-size:0.95rem; color:var(--primary);}
+.page .navBtn {
+  margin-top:20px; padding:12px 24px; border:none; border-radius:14px;
+  background:var(--primary); color:white; font-weight:800; cursor:pointer; transition:all 0.2s ease;
+}
+.page .navBtn:hover { transform:scale(1.05);}
+@keyframes fadeIn { from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);} }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- Pages -->
+<div class="page" id="page0">
+  <h1>✨ Hello Mr. Pookie Cookie 💙</h1>
+  <p>Tap the button below to start your magical birthday surprises! 🎉</p>
+  <button class="navBtn" onclick="nextPage(1)">Open the Magic 🪄</button>
+</div>
+
+<div class="page" id="page1">
+  <h1>Day 1–5 🎁</h1>
+  <p>Good morning! Let's start with a gift choice 🥳</p>
+  <div class="reveal">
+    <button class="choice" onclick="saveAnswer(1,'gift','Gift Box');showTease('Gift Box')">🎁 Gift Box</button>
+    <button class="choice" onclick="saveAnswer(1,'gift','Gift Card');showTease('Gift Card')">💳 Gift Card</button>
+  </div>
+  <div class="tease" id="tease1"></div>
+  <button class="navBtn" onclick="nextPage(2)">Next Day ➡️</button>
+</div>
+
+<div class="page" id="page2">
+  <h1>Day 6–10 🌟</h1>
+  <p>Pick a fun mood today! 😎</p>
+  <div class="reveal">
+    <button class="choice" onclick="saveAnswer(2,'mood','Playful');showTease('Playful')">😎 Playful</button>
+    <button class="choice" onclick="saveAnswer(2,'mood','Flirty');showTease('Flirty')">😘 Flirty</button>
+    <button class="choice" onclick="saveAnswer(2,'mood','Cheeky');showTease('Cheeky')">😏 Cheeky</button>
+  </div>
+  <div class="tease" id="tease2"></div>
+  <button class="navBtn" onclick="nextPage(3)">Next Day ➡️</button>
+</div>
+
+<div class="page" id="page3">
+  <h1>Day 11–15 🎉</h1>
+  <p>Let's add a flirty compliment 💖</p>
+  <div class="reveal">
+    <button class="choice" onclick="saveAnswer(3,'compliment','You are amazing!');showTease('You are amazing!')">💫 You are amazing!</button>
+    <button class="choice" onclick="saveAnswer(3,'compliment','Your smile is magical');showTease('Your smile is magical')">😊 Your smile is magical</button>
+    <button class="choice" onclick="saveAnswer(3,'compliment','You are a star');showTease('You are a star')">⭐ You are a star</button>
+  </div>
+  <div class="tease" id="tease3"></div>
+  <button class="navBtn" onclick="nextPage(4)">Next Day ➡️</button>
+</div>
+
+<div class="page" id="page4">
+  <h1>Day 16–20 🎂</h1>
+  <p>Time for a playful challenge! 🎲</p>
+  <div class="reveal">
+    <button class="choice" onclick="saveAnswer(4,'challenge','Dance');showTease('Dance like a star!')">💃 Dance</button>
+    <button class="choice" onclick="saveAnswer(4,'challenge','Sing');showTease('Sing your heart out!')">🎤 Sing</button>
+    <button class="choice" onclick="saveAnswer(4,'challenge','Joke');showTease('Tell a funny joke!')">😂 Joke</button>
+  </div>
+  <div class="tease" id="tease4"></div>
+  <button class="navBtn" onclick="nextPage(5)">Next Day ➡️</button>
+</div>
+
+<div class="page" id="page5">
+  <h1>Day 21–25 🎊</h1>
+  <p>Pick your birthday surprise! 🎁</p>
+  <div class="reveal">
+    <button class="choice" onclick="saveAnswer(5,'surprise','Cake');showTease('Sweet cake incoming!')">🍰 Cake</button>
+    <button class="choice" onclick="saveAnswer(5,'surprise','Balloon');showTease('Balloons everywhere!')">🎈 Balloon</button>
+    <button class="choice" onclick="saveAnswer(5,'surprise','Confetti');showTease('Confetti blast!')">🎉 Confetti</button>
+  </div>
+  <div class="tease" id="tease5"></div>
+  <button class="navBtn" onclick="nextPage(6)">Next Day ➡️</button>
+</div>
+
+<div class="page" id="page6">
+  <h1>Final Day 🎆</h1>
+  <p>Celebrate YOU today! 🥳</p>
+  <div class="reveal">
+    <button class="choice" onclick="saveAnswer(6,'final','Candle-lit');showTease('A romantic candle-lit vibe!')">🕯️ Candle-lit</button>
+    <button class="choice" onclick="saveAnswer(6,'final','Party');showTease('Let’s have a playful party!')">🎉 Party</button>
+  </div>
+  <div class="tease" id="tease6"></div>
+  <button class="navBtn" onclick="exportAnswers()">Export 🎁</button>
+</div>
+
+</div>
+
+<script>
+// ===== State =====
+let answers = JSON.parse(localStorage.getItem('pookie_answers')||'{}');
+
+// Nicknames for teasing
+const nicknames = [
+  'Beef Steak 🥩','Rafaello 🍬','Cadbury 🍫','Full Course Meal 🍽️','Mr. Buttery 🧈',
+  'Sexy 😏','Sexy Pookie 😘','Pookie Vampire 🧛','Hot & Spicy Meal 🌶️','Perfect Dessert 🍰'
+];
+
+// Save answer
+function saveAnswer(page,key,value){
+  answers['page'+page] = answers['page'+page]||{};
+  answers['page'+page][key]=value;
+  localStorage.setItem('pookie_answers',JSON.stringify(answers));
+}
+
+// Navigation
+let currentPage=0;
+function nextPage(id){
+  document.getElementById('page'+currentPage).classList.remove('active');
+  currentPage=id;
+  document.getElementById('page'+currentPage).classList.add('active');
+}
+
+// Show teasing message
+function showTease(text){
+  const teaseId='tease'+currentPage;
+  const el=document.getElementById(teaseId);
+  if(el){
+    const randomNick=nicknames[Math.floor(Math.random()*nicknames.length)];
+    const funEmojis=['💖','😏','🥳','✨','😍','😎','🎉','💫'];
     const randomEmoji=funEmojis[Math.floor(Math.random()*funEmojis.length)];
     el.textContent=`${randomEmoji} Hey ${randomNick}! ${text} ${randomEmoji}`;
   }
