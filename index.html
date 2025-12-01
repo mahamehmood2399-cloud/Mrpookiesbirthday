@@ -1,179 +1,208 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Pookie Cookie — Magical Countdown</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pookie Cookie — Magical Birthday Countdown</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&display=swap');
+
 :root{
-  --bg:#0b0b0b;
-  --gold:#D4AF37;
-  --muted:#E6D9B8;
-  --accent:#ff7aa2;
+  --bg:#f0f8ff;
+  --primary:#1e3a8a;
+  --accent:#60a5fa;
+  --muted:#333;
+  --gold:#ffd700;
 }
-*{box-sizing:border-box;}
-body{margin:0;height:100%;font-family:'Inter',sans-serif;background:linear-gradient(135deg,#0b0020,#1a0030,#0b0020);color:var(--muted);overflow-x:hidden;}
-.wrap{max-width:920px;margin:0 auto;padding:24px;}
-header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;}
-h1{margin:0;color:var(--gold);font-size:1.5rem;font-weight:800;}
-.sub{color:#cdbf93;font-size:0.95rem;margin-top:6px;}
-.card{
-  background: rgba(20,0,30,0.85);
-  border-radius: 16px;
-  padding: 20px;
-  margin: 20px 0;
-  box-shadow: 0 12px 28px rgba(0,0,0,0.7);
-  border: 1px solid rgba(212,175,55,0.2);
-  transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.6s ease;
+
+body {
+  margin:0;
+  height:100%;
+  font-family:'Inter',sans-serif;
+  background: linear-gradient(135deg,#e0f2fe,#bae6fd);
+  color: var(--muted);
+  overflow: hidden;
 }
-.card:hover{transform: translateY(-4px) scale(1.02);box-shadow:0 20px 40px rgba(212,175,55,0.35);}
-.pageTitle{font-weight:800;color:var(--gold);font-size:1.1rem;margin-bottom:6px;}
-.message{margin-top:10px;font-size:0.96rem;line-height:1.45;}
-.riddle{margin-top:12px;padding:12px;border-radius:10px;background:rgba(212,175,55,0.06);font-style:italic;color:#f7efd6;}
-.reveal{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;}
-.choice{
-  flex:1 1 120px;
-  padding:14px 20px;
-  border-radius:14px;
-  font-weight:700;
-  font-size:1rem;
-  cursor:pointer;
-  border:none;
-  color:#0b0b0b;
-  background:linear-gradient(135deg,#ffb3d1,#ffd58a);
-  box-shadow:0 8px 18px rgba(0,0,0,0.6);
-  transition:all 0.2s ease;
+
+.wrap {
+  max-width:800px;
+  margin:0 auto;
+  padding:24px;
+  height:100vh;
   display:flex;
-  align-items:center;
+  flex-direction:column;
   justify-content:center;
-  gap:6px;
+  align-items:center;
+  position:relative;
 }
-.choice:hover{transform:scale(1.08) rotate(-1deg);box-shadow:0 12px 24px rgba(255,223,150,0.7);}
-.small{font-size:0.82rem;color:#bfb38a;margin-top:10px;}
-#progressDots{display:flex;gap:6px;margin-top:12px;}
-.dot{width:12px;height:12px;border-radius:50%;background:rgba(212,175,55,0.18);box-shadow:0 4px 12px rgba(0,0,0,0.6);}
-.dot.active{background:var(--gold);animation:pulseDot 1.2s infinite alternate;}
-@keyframes pulseDot{0%{transform:scale(1)}50%{transform:scale(1.4)}100%{transform:scale(1)};}
-#curtainOverlay{
-  position:fixed;left:0;top:0;width:100vw;height:100vh;z-index:9999;display:flex;align-items:center;justify-content:center;
-  background:linear-gradient(180deg,#0b0020 0%, #2b0033 50%, #380043 100%);
-  overflow:hidden;flex-direction:column;color:var(--muted);text-align:center;
-  cursor:pointer;
+
+.page {
+  background:white;
+  border-radius:20px;
+  padding:30px;
+  box-shadow:0 10px 30px rgba(0,0,0,0.2);
+  text-align:center;
+  width:100%;
+  max-width:600px;
+  display:none;
+  flex-direction:column;
+  animation:fadeIn 0.5s ease forwards;
 }
-#curtainText{font-size:28px;font-weight:800;color:var(--gold);padding:12px;pointer-events:none;}
-#curtainSparkles{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;}
-#adminToggle,#exportBtn{
-  position:fixed;bottom:14px;padding:10px 12px;border-radius:12px;cursor:pointer;background:rgba(255,255,255,0.06);color:var(--gold);
-  font-weight:700;z-index:10000;transition:transform 0.2s ease,box-shadow 0.2s ease;
+
+.page.active { display:flex; }
+
+.page h1 { color: var(--primary); font-size:1.8rem; margin-bottom:10px; }
+.page p { font-size:1.1rem; margin:10px 0; }
+.page .riddle { font-style:italic; color:#555; margin:15px 0; }
+.page .reveal { display:flex; flex-wrap:wrap; gap:12px; justify-content:center; margin-top:15px; }
+.page button.choice {
+  background:var(--accent); color:white; border:none; padding:12px 20px; border-radius:12px;
+  cursor:pointer; font-weight:700; font-size:1rem; transition:all 0.2s ease;
+  display:flex; align-items:center; justify-content:center; gap:6px;
 }
-#adminToggle:hover,#exportBtn:hover{transform:scale(1.05);box-shadow:0 8px 20px rgba(255,215,0,0.6);}
-#fireworksCanvas{position:fixed;left:0;top:0;width:100%;height:100%;pointer-events:none;display:none;z-index:9998;}
+.page button.choice:hover { transform:scale(1.05) rotate(-1deg); box-shadow:0 6px 18px rgba(30,58,138,0.6);}
+.page .tease { margin-top:12px; font-weight:700; font-size:0.95rem; color:var(--primary);}
+.page .navBtn {
+  margin-top:20px; padding:12px 24px; border:none; border-radius:14px;
+  background:var(--primary); color:white; font-weight:800; cursor:pointer; transition:all 0.2s ease;
+}
+.page .navBtn:hover { transform:scale(1.05);}
+@keyframes fadeIn { from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);} }
 </style>
 </head>
 <body>
 <div class="wrap">
-<header>
-<div>
-<h1>Hello Mr. Pookie Cookie 💛</h1>
-<div class="sub">A short note: You make every day magical — welcome to your month of surprises!</div>
-</div>
-</header>
-<main id="main">
-<div class="card fadeIn">
-<div style="display:flex;align-items:center;justify-content:space-between">
-<div style="font-weight:800;color:var(--muted)">Progress</div>
-<div class="small">Tap each block to reveal fun surprises! 🎉</div>
-</div>
-<div id="progressDots"></div>
-</div>
-<div id="pages"></div>
-</main>
+
+<!-- Pages -->
+<div class="page" id="page0">
+  <h1>✨ Hello Mr. Pookie Cookie 💙</h1>
+  <p>Tap the button below to start your magical birthday surprises! 🎉</p>
+  <button class="navBtn" onclick="nextPage(1)">Open the Magic 🪄</button>
 </div>
 
-<button id="adminToggle" title="Toggle Admin View">⚙️ Admin</button>
-<button id="exportBtn" title="Export answers">💾 Export</button>
-
-<div id="curtainOverlay">
-  <canvas id="curtainSparkles"></canvas>
-  <div id="curtainText">✨ Tap to open your magical surprise ✨</div>
-  <div style="margin-top:8px;color:rgba(212,175,55,0.9)">A little magic awaits inside</div>
+<div class="page" id="page1">
+  <h1>Day 1–5 🎁</h1>
+  <p>Let's start with a gift choice 🥳</p>
+  <div class="reveal">
+    <button class="choice" onclick="saveAnswer(1,'gift','Gift Box');showTease('Gift Box')">🎁 Gift Box</button>
+    <button class="choice" onclick="saveAnswer(1,'gift','Gift Card');showTease('Gift Card')">💳 Gift Card</button>
+  </div>
+  <div class="tease" id="tease1"></div>
+  <button class="navBtn" onclick="nextPage(2)">Next Day ➡️</button>
 </div>
-<canvas id="fireworksCanvas"></canvas>
+
+<div class="page" id="page2">
+  <h1>Day 6–10 🌟</h1>
+  <p>Pick a fun mood today! 😎</p>
+  <div class="reveal">
+    <button class="choice" onclick="saveAnswer(2,'mood','Playful');showTease('Playful')">😎 Playful</button>
+    <button class="choice" onclick="saveAnswer(2,'mood','Flirty');showTease('Flirty')">😘 Flirty</button>
+    <button class="choice" onclick="saveAnswer(2,'mood','Cheeky');showTease('Cheeky')">😏 Cheeky</button>
+  </div>
+  <div class="tease" id="tease2"></div>
+  <button class="navBtn" onclick="nextPage(3)">Next Day ➡️</button>
+</div>
+
+<div class="page" id="page3">
+  <h1>Day 11–15 🎉</h1>
+  <p>Let's add a flirty compliment 💖</p>
+  <div class="reveal">
+    <button class="choice" onclick="saveAnswer(3,'compliment','You are amazing!');showTease('You are amazing!')">💫 You are amazing!</button>
+    <button class="choice" onclick="saveAnswer(3,'compliment','Your smile is magical');showTease('Your smile is magical')">😊 Your smile is magical</button>
+    <button class="choice" onclick="saveAnswer(3,'compliment','You are a star');showTease('You are a star')">⭐ You are a star</button>
+  </div>
+  <div class="tease" id="tease3"></div>
+  <button class="navBtn" onclick="nextPage(4)">Next Day ➡️</button>
+</div>
+
+<div class="page" id="page4">
+  <h1>Day 16–20 🎂</h1>
+  <p>Time for a playful challenge! 🎲</p>
+  <div class="reveal">
+    <button class="choice" onclick="saveAnswer(4,'challenge','Dance');showTease('Dance like a star!')">💃 Dance</button>
+    <button class="choice" onclick="saveAnswer(4,'challenge','Sing');showTease('Sing your heart out!')">🎤 Sing</button>
+    <button class="choice" onclick="saveAnswer(4,'challenge','Joke');showTease('Tell a funny joke!')">😂 Joke</button>
+  </div>
+  <div class="tease" id="tease4"></div>
+  <button class="navBtn" onclick="nextPage(5)">Next Day ➡️</button>
+</div>
+
+<div class="page" id="page5">
+  <h1>Day 21–25 🎊</h1>
+  <p>Pick your birthday surprise! 🎁</p>
+  <div class="reveal">
+    <button class="choice" onclick="saveAnswer(5,'surprise','Cake');showTease('Sweet cake incoming!')">🍰 Cake</button>
+    <button class="choice" onclick="saveAnswer(5,'surprise','Balloon');showTease('Balloons everywhere!')">🎈 Balloon</button>
+    <button class="choice" onclick="saveAnswer(5,'surprise','Confetti');showTease('Confetti blast!')">🎉 Confetti</button>
+  </div>
+  <div class="tease" id="tease5"></div>
+  <button class="navBtn" onclick="nextPage(6)">Next Day ➡️</button>
+</div>
+
+<div class="page" id="page6">
+  <h1>Final Day 🎆</h1>
+  <p>Celebrate YOU today! 🥳</p>
+  <div class="reveal">
+    <button class="choice" onclick="saveAnswer(6,'final','Candle-lit');showTease('A romantic candle-lit vibe!')">🕯️ Candle-lit</button>
+    <button class="choice" onclick="saveAnswer(6,'final','Party');showTease('Let’s have a playful party!')">🎉 Party</button>
+  </div>
+  <div class="tease" id="tease6"></div>
+  <button class="navBtn" onclick="exportAnswers()">Export 🎁</button>
+</div>
+
+</div>
 
 <script>
-// ===== State & Content =====
-let state=JSON.parse(localStorage.getItem('pookie_full_state_v1')||'{"progress":0,"answers":{}}');
-let adminMode=localStorage.getItem('pookie_admin')==='1';
-const BLOCK_DATES=["2025-12-01","2025-12-05","2025-12-10","2025-12-15","2025-12-20","2025-12-25","2025-12-30"];
-const BLOCK_CONTENT=[
-  {title:"Days 1–4",intro:"Hello Pookie Cookie 🌞",message:"You make the day sweeter just by being you.",riddle:"I have keys but no locks. What am I?",questions:[{k:"mood1",q:"Pick your vibe today!",opts:["😎 Playful","🌸 Smooth","😏 Cheeky"]}]},
-  {title:"Days 5–9",intro:"Mid-month mischief 🍫",message:"You add laughter to ordinary hours.",riddle:"What runs but never walks?",questions:[{k:"mood2",q:"Choose your energy!",opts:["⚡ Excited","🌙 Calm","🔥 Bold"]}]},
-  {title:"Days 10–14",intro:"Halfway vibes ✨",message:"Your laughter is my favorite sound.",riddle:"I speak without a mouth and hear without ears. What am I?",questions:[{k:"nickname3",q:"Pick a nickname!",opts:["🍬 Sweet","🍫 Classy","🍭 Funny"]}]},
-  {title:"Days 15–19",intro:"Flirty stretch 💖",message:"Your energy shines.",riddle:"I fly without wings and cry without eyes. What am I?",questions:[{k:"game4",q:"Play a fun quiz?",opts:["🎲 Yes","🎯 No","🎉 Surprise me"]}]},
-  {title:"Days 20–24",intro:"Car-lover treats 🚗",message:"Tiny speedsters and big smiles.",riddle:"What has a head and a tail but no body?",questions:[{k:"giftFlag5",q:"Choose gift option:",opts:["🎁 Option A","🎁 Option B"]}]},
-  {title:"Days 25–29",intro:"Birthday dinner planning 🍽️",message:"Pick a dinner spot.",riddle:"What is always in front of you but can't be seen?",questions:[{k:"restaurant6",q:"Choose restaurant:",opts:["🍴 Ktore","🍷 Silo","🍽️ Astasi","🥂 Terraza"]}]},
-  {title:"Day 30",intro:"Final reveal 🎆",message:"Celebrate YOU!",riddle:"Final riddle: What ends everything?",questions:[{k:"finalMood7",q:"Final mood:",opts:["🕯️ Candle-lit","🎉 Playful bash"]}]}
+// ===== State =====
+let answers = JSON.parse(localStorage.getItem('pookie_answers')||'{}');
+
+// Nicknames for teasing
+const nicknames = [
+  'Beef Steak 🥩','Rafaello 🍬','Cadbury 🍫','Full Course Meal 🍽️','Mr. Buttery 🧈',
+  'Sexy 😉','Sexy Pookie 😘','Pookie Vampire 🧛','Hot & Spicy Meal 🌶️','Perfect Dessert 🍰'
 ];
 
-const pagesEl=document.getElementById('pages');
-const progressDots=document.getElementById('progressDots');
-function saveState(){localStorage.setItem('pookie_full_state_v1',JSON.stringify(state));}
-function renderProgressDots(){progressDots.innerHTML='';for(let i=0;i<BLOCK_CONTENT.length;i++){const dot=document.createElement('div');dot.className='dot'+((adminMode||(i+1<=state.progress)||getToday()>=BLOCK_DATES[i]?' active':''));progressDots.appendChild(dot);}}
-
-// ===== Helpers =====
-function getToday(){const now=new Date();const utcMs=now.getTime()+(now.getTimezoneOffset()*60000);const tzMs=5*60*60*1000;return new Date(utcMs+tzMs).toISOString().slice(0,10);}
-function isUnlocked(idx){return adminMode||state.progress>=idx||getToday()>=BLOCK_DATES[idx-1];}
-
-// ===== Render Blocks =====
-function renderAll(){
-  pagesEl.innerHTML=''; renderProgressDots();
-  BLOCK_CONTENT.forEach((content,i)=>{
-    const idx=i+1;
-    const unlocked=isUnlocked(idx);
-    const section=document.createElement('section'); section.className='card fadeIn'+(unlocked?'':' locked');
-    section.setAttribute('data-block',idx);
-    const header=document.createElement('div'); header.className='pageHeader';
-    header.innerHTML=`<div><div class="pageTitle">${content.title}</div><div class="small">${content.intro}</div></div>`;
-    section.appendChild(header);
-    const msg=document.createElement('div'); msg.className='message'; msg.innerHTML=`<strong>${content.message}</strong>`;
-    section.appendChild(msg);
-    const riddle=document.createElement('div'); riddle.className='riddle'; riddle.textContent='Riddle — '+content.riddle;
-    section.appendChild(riddle);
-    const interactive=document.createElement('div'); interactive.id=`interactive-${idx}`; interactive.style.display='none';
-    content.questions.forEach(q=>{
-      const qWrap=document.createElement('div'); qWrap.style.marginTop='12px';
-      const qText=document.createElement('div'); qText.style.fontWeight='800'; qText.style.marginBottom='8px'; qText.textContent=q.q;
-      qWrap.appendChild(qText);
-      const row=document.createElement('div'); row.className='reveal';
-      q.opts.forEach(opt=>{
-        const b=document.createElement('button'); b.className='choice'; b.innerHTML=opt;
-        b.addEventListener('click',()=>{state.answers['block'+idx]=state.answers['block'+idx]||{}; state.answers['block'+idx][q.k]=opt; saveState();});
-        row.appendChild(b);
-      });
-      qWrap.appendChild(row); interactive.appendChild(qWrap);
-    });
-    section.appendChild(interactive);
-    const revealBtn=document.createElement('button'); revealBtn.className='revealBtn'; revealBtn.textContent=unlocked?'Open this block':'Locked';
-    if(!unlocked) revealBtn.disabled=true;
-    revealBtn.addEventListener('click',()=>{interactive.style.display=interactive.style.display==='block'?'none':'block'; if(state.progress<idx+1) state.progress=idx+1; saveState(); renderProgressDots();});
-    section.appendChild(revealBtn);
-    pagesEl.appendChild(section);
-  });
+// Save answer
+function saveAnswer(page,key,value){
+  answers['page'+page] = answers['page'+page]||{};
+  answers['page'+page][key]=value;
+  localStorage.setItem('pookie_answers',JSON.stringify(answers));
 }
 
-// ===== Curtain Tap =====
-const curtain=document.getElementById('curtainOverlay');
-const curtainCanvas=document.getElementById('curtainSparkles');
-curtainCanvas.style.pointerEvents='none';
-curtain.addEventListener('click',()=>{
-  curtain.style.transition='opacity 0.7s ease';
-  curtain.style.opacity='0';
-  setTimeout(()=>{curtain.style.display='none'; if(!state.answers) state.answers={}; if(state.progress<1) state.progress=1; saveState(); renderAll();},700);
-});
+// Navigation
+let currentPage=0;
+function nextPage(id){
+  document.getElementById('page'+currentPage).classList.remove('active');
+  currentPage=id;
+  document.getElementById('page'+currentPage).classList.add('active');
+}
 
-// ===== Initialize =====
-renderAll();
+// Show teasing message
+function showTease(text){
+  const teaseId='tease'+currentPage;
+  const el=document.getElementById(teaseId);
+  if(el){
+    const randomNick=nicknames[Math.floor(Math.random()*nicknames.length)];
+    const funEmojis=['💖','😉','🥳','✨','😍','😎','🎉','💫'];
+    const randomEmoji=funEmojis[Math.floor(Math.random()*funEmojis.length)];
+    el.textContent=`${randomEmoji} Hey ${randomNick}! ${text} ${randomEmoji}`;
+  }
+}
+
+// Export answers
+function exportAnswers(){
+  const data=JSON.stringify(answers,null,2);
+  const blob=new Blob([data],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;
+  a.download='pookie_answers.json';
+  a.click();
+  a.remove();
+}
+
+// Init
+nextPage(0);
 </script>
 </body>
 </html>
