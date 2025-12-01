@@ -67,261 +67,10 @@ h1{margin:0;color:var(--gold);font-size:1.5rem;font-weight:800}
   position:fixed;left:0;top:0;width:100vw;height:100vh;z-index:9999;display:flex;align-items:center;justify-content:center;
   background:linear-gradient(180deg,#0b0020 0%, #2b0033 50%, #380043 100%);
   overflow:hidden;flex-direction:column;color:var(--muted);text-align:center;
-}
-#curtainText{font-size:28px;font-weight:800;color:var(--gold);padding:12px}
-#curtainSparkles{position:absolute;left:0;top:0;pointer-events:none}
-
-#adminToggle,#exportBtn{
-  position:fixed;bottom:14px;padding:10px 12px;border-radius:12px;cursor:pointer;background:rgba(255,255,255,0.06);color:var(--gold);
-  font-weight:700;z-index:10000;transition:transform 0.2s ease,box-shadow 0.2s ease;
-}
-#adminToggle:hover,#exportBtn:hover{transform:scale(1.05);box-shadow:0 8px 20px rgba(255,215,0,0.6)}
-
-#fireworksCanvas{position:fixed;left:0;top:0;width:100%;height:100%;pointer-events:none;display:none;z-index:9998}
-
-.confetti-piece{
-  position:absolute;
-  width:8px;
-  height:8px;
-  background: #FFD700;
-  opacity:0.9;
-  transform:rotate(0deg);
-  pointer-events:none;
-  z-index:9997;
-}
-</style>
-</head>
-<body>
-
-<div class="wrap">
-  <header>
-    <div>
-      <h1>Hello Mr. Pookie Cookie 💛</h1>
-      <div class="sub">A short note: You make every day magical — welcome to your month of surprises!</div>
-    </div>
-  </header>
-
-  <main id="main">
-    <div class="card fadeIn">
-      <div style="display:flex;align-items:center;justify-content:space-between">
-        <div style="font-weight:800;color:var(--muted)">Progress</div>
-        <div class="small">Tap each block to reveal fun surprises! 🎉</div>
-      </div>
-      <div id="progressDots"></div>
-    </div>
-
-    <div id="pages"></div>
-  </main>
-</div>
-
-<button id="adminToggle" title="Toggle Admin View">⚙️ Admin</button>
-<button id="exportBtn" title="Export answers">💾 Export</button>
-
-<div id="curtainOverlay">
-  <canvas id="curtainSparkles"></canvas>
-  <div id="curtainText">✨ Tap to open your magical surprise ✨</div>
-  <div style="margin-top:8px;color:rgba(212,175,55,0.9)">A little magic awaits inside</div>
-</div>
-
-<canvas id="fireworksCanvas"></canvas>
-
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.30.0/firebase-app.js";
-import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/11.30.0/firebase-database.js";
-
-// Firebase config
-const firebaseConfig = {
-  apiKey: "AIzaSyAxrxUO86_bBRWvG7MPPEiplyMZcP_BBaw",
-  authDomain: "mr-pookie-birthday.firebaseapp.com",
-  databaseURL: "https://mr-pookie-birthday-default-rtdb.firebaseio.com",
-  projectId: "mr-pookie-birthday",
-  storageBucket: "mr-pookie-birthday.appspot.com",
-  messagingSenderId: "440258697166",
-  appId: "1:440258697166:web:c561f120ea13d7a234bd9f"
-};
-const app = initializeApp(firebaseConfig);
-const database = getDatabase(app);
-function saveToFirebase(blockIdx,key,value){ set(ref(database,`answers/block${blockIdx}/${key}`),value).catch(e=>console.error(e)); }
-
-// Block content
-const BLOCK_DATES=["2025-12-01","2025-12-05","2025-12-10","2025-12-15","2025-12-20","2025-12-25","2025-12-30"];
-const BLOCK_CONTENT=[
-  {title:"Days 1–4",intro:"Hello Pookie Cookie 🌞",message:"You make the day sweeter just by being you.",riddle:"I have keys but no locks. What am I?",questions:[{k:"mood1",q:"Pick your vibe today!",opts:["😎 Playful","🌸 Smooth","😏 Cheeky"]}]},
-  {title:"Days 5–9",intro:"Mid-month mischief 🍫",message:"You add laughter to ordinary hours.",riddle:"What runs but never walks?",questions:[{k:"mood2",q:"Choose your energy!",opts:["⚡ Excited","🌙 Calm","🔥 Bold"]}]},
-  {title:"Days 10–14",intro:"Halfway vibes ✨",message:"Your laughter is my favorite sound.",riddle:"I speak without a mouth and hear without ears. What am I?",questions:[{k:"nickname3",q:"Pick a nickname!",opts:["🍬 Sweet","🍫 Classy","🍭 Funny"]}]},
-  {title:"Days 15–19",intro:"Flirty stretch 💖",message:"Your energy shines.",riddle:"I fly without wings and cry without eyes. What am I?",questions:[{k:"game4",q:"Play a fun quiz?",opts:["🎲 Yes","🎯 No","🎉 Surprise me"]}]},
-  {title:"Days 20–24",intro:"Car-lover treats 🚗",message:"Tiny speedsters and big smiles.",riddle:"What has a head and a tail but no body?",questions:[{k:"giftFlag5",q:"Choose gift option:",opts:["🎁 Option A","🎁 Option B"]}]},
-  {title:"Days 25–29",intro:"Birthday dinner planning 🍽️",message:"Pick a dinner spot.",riddle:"What is always in front of you but can't be seen?",questions:[{k:"restaurant6",q:"Choose restaurant:",opts:["🍴 Ktore","🍷 Silo","🍽️ Astasi","🥂 Terraza"]}]},
-  {title:"Day 30",intro:"Final reveal 🎆",message:"Celebrate YOU!",riddle:"Final riddle: What ends everything?",questions:[{k:"finalMood7",q:"Final mood:",opts:["🕯️ Candle-lit","🎉 Playful bash"]}]}
-];
-
-let state=JSON.parse(localStorage.getItem('pookie_full_state_v1')||'{"progress":0,"answers":{}}');
-let adminMode=localStorage.getItem('pookie_admin')==='1';
-function getKarachiDateStr(){ const now=new Date(); const utcMs=now.getTime()+(now.getTimezoneOffset()*60000); const tzMs=5*60*60*1000; return new Date(utcMs+tzMs).toISOString().slice(0,10);}
-function isDateReached(index){return getKarachiDateStr()>=BLOCK_DATES[index];}
-
-// Curtain sparkles
-const curtain=document.getElementById('curtainOverlay');
-const curtainCanvas=document.getElementById('curtainSparkles');
-const cctx=curtainCanvas.getContext('2d'); let cw,ch,sparks=[];
-function resizeCurtain(){cw=curtainCanvas.width=window.innerWidth;ch=curtainCanvas.height=window.innerHeight;}
-resizeCurtain(); window.addEventListener('resize',resizeCurtain);
-function Sparkle(){this.x=Math.random()*cw;this.y=Math.random()*ch;this.s=Math.random()*2+1;this.a=Math.random()*0.8+0.2;this.h=Math.floor(Math.random()*360);this.vx=(Math.random()-0.5)*0.4;this.vy=(Math.random()-0.5)*0.4;}
-Sparkle.prototype.update=function(){this.x+=this.vx;this.y+=this.vy;this.a-=0.0008;if(this.a<=0){this.x=Math.random()*cw;this.y=Math.random()*ch;this.a=Math.random()*0.8+0.2;}}
-Sparkle.prototype.draw=function(){cctx.save();cctx.globalAlpha=this.a;cctx.fillStyle=`hsl(${this.h} 100% 70%)`;cctx.beginPath();cctx.arc(this.x,this.y,this.s,0,Math.PI*2);cctx.fill();cctx.restore();}
-for(let i=0;i<90;i++)sparks.push(new Sparkle());
-function drawSparks(){cctx.clearRect(0,0,cw,ch);for(let s of sparks)s.update(),s.draw();requestAnimationFrame(drawSparks);}
-drawSparks();
-curtain.addEventListener('click',()=>{
-  curtain.style.transition='opacity .7s ease';
-  curtain.style.opacity='0';
-  setTimeout(()=>{ curtain.style.display='none'; state.progress=Math.max(1,state.progress); localStorage.setItem('pookie_full_state_v1',JSON.stringify(state)); renderAll(); },750);
-});
-
-// Progress and block rendering
-const pagesEl=document.getElementById('pages');
-const progressDots=document.getElementById('progressDots');
-function saveState(){ localStorage.setItem('pookie_full_state_v1',JSON.stringify(state)); }
-function renderProgressDots(){progressDots.innerHTML='';for(let i=0;i<BLOCK_CONTENT.length;i++){const dot=document.createElement('div');dot.className='dot'+((adminMode||(i+1<=state.progress)||isDateReached(i)?' active':''));progressDots.appendChild(dot);}}
-
-function renderAll(){
-  pagesEl.innerHTML='';
-  renderProgressDots();
-  for(let i=0;i<BLOCK_CONTENT.length;i++){
-    const idx=i+1;
-    const content=BLOCK_CONTENT[i];
-    const dateUnlocked=isDateReached(i);
-    const unlocked=adminMode||dateUnlocked||(idx<=state.progress);
-    const section=document.createElement('section');
-    section.className='card fadeIn'+(unlocked?'':' locked');
-    section.setAttribute('data-block',idx);
-
-    const header=document.createElement('div'); header.className='pageHeader';
-    header.innerHTML=`<div><div class="pageTitle">${content.title}</div><div class="small">${content.intro}</div></div><div class="small">${dateUnlocked?'Date open':(idx<=state.progress?'Unlocked':'Locked')}</div>`;
-    section.appendChild(header);
-
-    const msg=document.createElement('div'); msg.className='message'; msg.innerHTML=`<strong>${content.message}</strong>`;
-    section.appendChild(msg);
-
-    const riddle=document.createElement('div'); riddle.className='riddle'; riddle.textContent='Riddle — '+content.riddle;
-    section.appendChild(riddle);
-
-    const revealBtn=document.createElement('button'); revealBtn.className='revealBtn'; revealBtn.textContent=unlocked?'Open this block':'Locked';
-    if(!unlocked) revealBtn.disabled=true;
-    section.appendChild(revealBtn);
-
-    const interactive=document.createElement('div'); interactive.className='hidden'; interactive.id=`interactive-${idx}`;
-
-    content.questions.forEach(q=>{
-      const qWrap=document.createElement('div'); qWrap.style.marginTop='12px';
-      const qText=document.createElement('div'); qText.style.fontWeight='800'; qText.style.marginBottom='8px'; qText.textContent=q.q;
-      qWrap.appendChild(qText);
-      const row=document.createElement('div'); row.className='reveal';
-      q.opts.forEach(opt=>{
-        const b=document.createElement('button'); b.className='choice'; b.innerHTML=opt; 
-        b.addEventListener('click',()=>{state.answers['block'+idx]=state.answers['block'+idx]||{};state.answers['block'+idx][q.k]=opt;saveToFirebase(idx,q.k,opt); saveState(); showConfirmation(idx,opt); if(idx===BLOCK_CONTENT.length)spawnFinalFireworks();});
-        row.appendChild(b);
-      });
-      qWrap.appendChild(row);
-      interactive.appendChild(qWrap);
-    });
-
-    const conf=document.createElement('div'); conf.id=`conf-${idx}`; conf.className='small'; conf.style.marginTop='12px'; interactive.appendChild(conf);
-
-    revealBtn.addEventListener('click',()=>{
-      interactive.style.display=interactive.style.display==='block'?'none':'block';
-      state.answers['block'+idx]=state.answers['block'+idx]||{}; state.answers['block'+idx].opened=true;
-      if(state.progress<idx+1&&idx<BLOCK_CONTENT.length){state.progress=idx+1; saveState(); renderAll();}
-      populateSaved();
-    });
-
-    section.appendChild(interactive);
-    pagesEl.appendChild(section);
-  }
-  populateSaved();
-}
-function showConfirmation(idx,text){const el=document.getElementById(`conf-${idx}`); if(el){el.innerHTML='<strong>Saved:</strong> '+text;el.style.fontWeight='700';}}
-function populateSaved(){for(let i=1;i<=BLOCK_CONTENT.length;i++){const el=document.getElementById(`conf-${i}`);const saved=state.answers['block'+i];if(el){if(saved){const parts=[];for(const k in saved)parts.push(`${k}: ${saved[k]}`);el.innerHTML='<strong>Saved:</strong> '+parts.join(' • ');}else el.innerHTML='';}}}
-
-document.getElementById('adminToggle').addEventListener('click',()=>{adminMode=!adminMode; localStorage.setItem('pookie_admin',adminMode?'1':'0'); renderAll();});
-document.getElementById('exportBtn').addEventListener('click',()=>{const data=JSON.stringify(state.answers||{},null,2); const blob=new Blob([data],{type:'application/json'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download='pookie_answers.json'; a.click(); a.remove();});
-
-// Initialize
-renderAll();
-</script>
-</body>
-</html><!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Pookie Cookie — Magical Countdown</title>
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&display=swap');
-
-:root{
-  --bg:#0b0b0b;
-  --gold:#D4AF37;
-  --muted:#E6D9B8;
-  --accent:#ff7aa2;
-}
-*{box-sizing:border-box}
-body{margin:0;height:100%;font-family:'Inter',sans-serif;background:linear-gradient(135deg,#0b0020,#1a0030,#0b0020);color:var(--muted);overflow-x:hidden;transition:background 1.5s linear}
-.wrap{max-width:920px;margin:0 auto;padding:24px}
-header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
-h1{margin:0;color:var(--gold);font-size:1.5rem;font-weight:800}
-.sub{color:#cdbf93;font-size:0.95rem;margin-top:6px}
-
-.card{
-  background: rgba(20,0,30,0.85);
-  border-radius: 16px;
-  padding: 20px;
-  margin: 20px 0;
-  box-shadow: 0 12px 28px rgba(0,0,0,0.7);
-  border: 1px solid rgba(212,175,55,0.2);
-  transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.6s ease;
-  position: relative;
-  overflow: hidden;
-}
-.card:hover{transform: translateY(-4px) scale(1.02);box-shadow:0 20px 40px rgba(212,175,55,0.35);}
-.pageTitle{font-weight:800;color:var(--gold);font-size:1.1rem;margin-bottom:6px}
-.message{margin-top:10px;font-size:0.96rem;line-height:1.45}
-.riddle{margin-top:12px;padding:12px;border-radius:10px;background:rgba(212,175,55,0.06);font-style:italic;color:#f7efd6}
-
-.reveal,.choices{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;z-index:2;position:relative}
-.choice{
-  flex:1 1 120px;
-  padding:14px 20px;
-  border-radius:14px;
-  font-weight:700;
-  font-size:1rem;
   cursor:pointer;
-  border:none;
-  color:#0b0b0b;
-  background:linear-gradient(135deg,#ffb3d1,#ffd58a);
-  box-shadow:0 8px 18px rgba(0,0,0,0.6);
-  transition:all 0.2s ease;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:6px;
 }
-.choice:hover{transform:scale(1.08) rotate(-1deg);box-shadow:0 12px 24px rgba(255,223,150,0.7);}
-.choice span.emoji{font-size:1.3rem}
-
-.small{font-size:0.82rem;color:#bfb38a;margin-top:10px}
-#progressDots{display:flex;gap:6px;margin-top:12px}
-.dot{width:12px;height:12px;border-radius:50%;background:rgba(212,175,55,0.18);box-shadow:0 4px 12px rgba(0,0,0,0.6);transition:all .25s ease}
-.dot.active{background:var(--gold);animation:pulseDot 1.2s infinite alternate}
-@keyframes pulseDot{0%{transform:scale(1)}50%{transform:scale(1.4)}100%{transform:scale(1)}}
-
-#curtainOverlay{
-  position:fixed;left:0;top:0;width:100vw;height:100vh;z-index:9999;display:flex;align-items:center;justify-content:center;
-  background:linear-gradient(180deg,#0b0020 0%, #2b0033 50%, #380043 100%);
-  overflow:hidden;flex-direction:column;color:var(--muted);text-align:center;
-}
-#curtainText{font-size:28px;font-weight:800;color:var(--gold);padding:12px}
-#curtainSparkles{position:absolute;left:0;top:0;pointer-events:none}
+#curtainText{font-size:28px;font-weight:800;color:var(--gold);padding:12px;pointer-events:none}
+#curtainSparkles{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none}
 
 #adminToggle,#exportBtn{
   position:fixed;bottom:14px;padding:10px 12px;border-radius:12px;cursor:pointer;background:rgba(255,255,255,0.06);color:var(--gold);
@@ -330,17 +79,6 @@ h1{margin:0;color:var(--gold);font-size:1.5rem;font-weight:800}
 #adminToggle:hover,#exportBtn:hover{transform:scale(1.05);box-shadow:0 8px 20px rgba(255,215,0,0.6)}
 
 #fireworksCanvas{position:fixed;left:0;top:0;width:100%;height:100%;pointer-events:none;display:none;z-index:9998}
-
-.confetti-piece{
-  position:absolute;
-  width:8px;
-  height:8px;
-  background: #FFD700;
-  opacity:0.9;
-  transform:rotate(0deg);
-  pointer-events:none;
-  z-index:9997;
-}
 </style>
 </head>
 <body>
@@ -377,11 +115,10 @@ h1{margin:0;color:var(--gold);font-size:1.5rem;font-weight:800}
 
 <canvas id="fireworksCanvas"></canvas>
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.30.0/firebase-app.js";
-import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/11.30.0/firebase-database.js";
-
-// Firebase config
+<script src="https://www.gstatic.com/firebasejs/11.30.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/11.30.0/firebase-database.js"></script>
+<script>
+// Firebase setup
 const firebaseConfig = {
   apiKey: "AIzaSyAxrxUO86_bBRWvG7MPPEiplyMZcP_BBaw",
   authDomain: "mr-pookie-birthday.firebaseapp.com",
@@ -391,11 +128,11 @@ const firebaseConfig = {
   messagingSenderId: "440258697166",
   appId: "1:440258697166:web:c561f120ea13d7a234bd9f"
 };
-const app = initializeApp(firebaseConfig);
-const database = getDatabase(app);
-function saveToFirebase(blockIdx,key,value){ set(ref(database,`answers/block${blockIdx}/${key}`),value).catch(e=>console.error(e)); }
+firebase.initializeApp(firebaseConfig);
+const database = firebase.database();
+function saveToFirebase(blockIdx,key,value){ firebase.database().ref(`answers/block${blockIdx}/${key}`).set(value).catch(console.error); }
 
-// Block content
+// Block data
 const BLOCK_DATES=["2025-12-01","2025-12-05","2025-12-10","2025-12-15","2025-12-20","2025-12-25","2025-12-30"];
 const BLOCK_CONTENT=[
   {title:"Days 1–4",intro:"Hello Pookie Cookie 🌞",message:"You make the day sweeter just by being you.",riddle:"I have keys but no locks. What am I?",questions:[{k:"mood1",q:"Pick your vibe today!",opts:["😎 Playful","🌸 Smooth","😏 Cheeky"]}]},
@@ -412,41 +149,19 @@ let adminMode=localStorage.getItem('pookie_admin')==='1';
 function getKarachiDateStr(){ const now=new Date(); const utcMs=now.getTime()+(now.getTimezoneOffset()*60000); const tzMs=5*60*60*1000; return new Date(utcMs+tzMs).toISOString().slice(0,10);}
 function isDateReached(index){return getKarachiDateStr()>=BLOCK_DATES[index];}
 
-// Curtain sparkles
-const curtain=document.getElementById('curtainOverlay');
-const curtainCanvas=document.getElementById('curtainSparkles');
-const cctx=curtainCanvas.getContext('2d'); let cw,ch,sparks=[];
-function resizeCurtain(){cw=curtainCanvas.width=window.innerWidth;ch=curtainCanvas.height=window.innerHeight;}
-resizeCurtain(); window.addEventListener('resize',resizeCurtain);
-function Sparkle(){this.x=Math.random()*cw;this.y=Math.random()*ch;this.s=Math.random()*2+1;this.a=Math.random()*0.8+0.2;this.h=Math.floor(Math.random()*360);this.vx=(Math.random()-0.5)*0.4;this.vy=(Math.random()-0.5)*0.4;}
-Sparkle.prototype.update=function(){this.x+=this.vx;this.y+=this.vy;this.a-=0.0008;if(this.a<=0){this.x=Math.random()*cw;this.y=Math.random()*ch;this.a=Math.random()*0.8+0.2;}}
-Sparkle.prototype.draw=function(){cctx.save();cctx.globalAlpha=this.a;cctx.fillStyle=`hsl(${this.h} 100% 70%)`;cctx.beginPath();cctx.arc(this.x,this.y,this.s,0,Math.PI*2);cctx.fill();cctx.restore();}
-for(let i=0;i<90;i++)sparks.push(new Sparkle());
-function drawSparks(){cctx.clearRect(0,0,cw,ch);for(let s of sparks)s.update(),s.draw();requestAnimationFrame(drawSparks);}
-drawSparks();
-curtain.addEventListener('click',()=>{
-  curtain.style.transition='opacity .7s ease';
-  curtain.style.opacity='0';
-  setTimeout(()=>{ curtain.style.display='none'; state.progress=Math.max(1,state.progress); localStorage.setItem('pookie_full_state_v1',JSON.stringify(state)); renderAll(); },750);
-});
-
-// Progress and block rendering
 const pagesEl=document.getElementById('pages');
 const progressDots=document.getElementById('progressDots');
 function saveState(){ localStorage.setItem('pookie_full_state_v1',JSON.stringify(state)); }
 function renderProgressDots(){progressDots.innerHTML='';for(let i=0;i<BLOCK_CONTENT.length;i++){const dot=document.createElement('div');dot.className='dot'+((adminMode||(i+1<=state.progress)||isDateReached(i)?' active':''));progressDots.appendChild(dot);}}
 
 function renderAll(){
-  pagesEl.innerHTML='';
-  renderProgressDots();
+  pagesEl.innerHTML=''; renderProgressDots();
   for(let i=0;i<BLOCK_CONTENT.length;i++){
-    const idx=i+1;
-    const content=BLOCK_CONTENT[i];
+    const idx=i+1; const content=BLOCK_CONTENT[i];
     const dateUnlocked=isDateReached(i);
     const unlocked=adminMode||dateUnlocked||(idx<=state.progress);
     const section=document.createElement('section');
-    section.className='card fadeIn'+(unlocked?'':' locked');
-    section.setAttribute('data-block',idx);
+    section.className='card fadeIn'+(unlocked?'':' locked'); section.setAttribute('data-block',idx);
 
     const header=document.createElement('div'); header.className='pageHeader';
     header.innerHTML=`<div><div class="pageTitle">${content.title}</div><div class="small">${content.intro}</div></div><div class="small">${dateUnlocked?'Date open':(idx<=state.progress?'Unlocked':'Locked')}</div>`;
@@ -459,47 +174,33 @@ function renderAll(){
     section.appendChild(riddle);
 
     const revealBtn=document.createElement('button'); revealBtn.className='revealBtn'; revealBtn.textContent=unlocked?'Open this block':'Locked';
-    if(!unlocked) revealBtn.disabled=true;
-    section.appendChild(revealBtn);
+    if(!unlocked) revealBtn.disabled=true; section.appendChild(revealBtn);
 
     const interactive=document.createElement('div'); interactive.className='hidden'; interactive.id=`interactive-${idx}`;
-
     content.questions.forEach(q=>{
       const qWrap=document.createElement('div'); qWrap.style.marginTop='12px';
       const qText=document.createElement('div'); qText.style.fontWeight='800'; qText.style.marginBottom='8px'; qText.textContent=q.q;
       qWrap.appendChild(qText);
       const row=document.createElement('div'); row.className='reveal';
       q.opts.forEach(opt=>{
-        const b=document.createElement('button'); b.className='choice'; b.innerHTML=opt; 
-        b.addEventListener('click',()=>{state.answers['block'+idx]=state.answers['block'+idx]||{};state.answers['block'+idx][q.k]=opt;saveToFirebase(idx,q.k,opt); saveState(); showConfirmation(idx,opt); if(idx===BLOCK_CONTENT.length)spawnFinalFireworks();});
+        const b=document.createElement('button'); b.className='choice'; b.innerHTML=opt;
+        b.addEventListener('click',()=>{state.answers['block'+idx]=state.answers['block'+idx]||{};state.answers['block'+idx][q.k]=opt;saveToFirebase(idx,q.k,opt); saveState();});
         row.appendChild(b);
       });
-      qWrap.appendChild(row);
-      interactive.appendChild(qWrap);
+      qWrap.appendChild(row); interactive.appendChild(qWrap);
     });
-
-    const conf=document.createElement('div'); conf.id=`conf-${idx}`; conf.className='small'; conf.style.marginTop='12px'; interactive.appendChild(conf);
-
-    revealBtn.addEventListener('click',()=>{
-      interactive.style.display=interactive.style.display==='block'?'none':'block';
-      state.answers['block'+idx]=state.answers['block'+idx]||{}; state.answers['block'+idx].opened=true;
-      if(state.progress<idx+1&&idx<BLOCK_CONTENT.length){state.progress=idx+1; saveState(); renderAll();}
-      populateSaved();
-    });
-
     section.appendChild(interactive);
+    revealBtn.addEventListener('click',()=>{interactive.style.display=interactive.style.display==='block'?'none':'block'; if(state.progress<idx+1) state.progress=idx+1; saveState(); renderProgressDots();});
     pagesEl.appendChild(section);
   }
-  populateSaved();
 }
-function showConfirmation(idx,text){const el=document.getElementById(`conf-${idx}`); if(el){el.innerHTML='<strong>Saved:</strong> '+text;el.style.fontWeight='700';}}
-function populateSaved(){for(let i=1;i<=BLOCK_CONTENT.length;i++){const el=document.getElementById(`conf-${i}`);const saved=state.answers['block'+i];if(el){if(saved){const parts=[];for(const k in saved)parts.push(`${k}: ${saved[k]}`);el.innerHTML='<strong>Saved:</strong> '+parts.join(' • ');}else el.innerHTML='';}}}
-
-document.getElementById('adminToggle').addEventListener('click',()=>{adminMode=!adminMode; localStorage.setItem('pookie_admin',adminMode?'1':'0'); renderAll();});
-document.getElementById('exportBtn').addEventListener('click',()=>{const data=JSON.stringify(state.answers||{},null,2); const blob=new Blob([data],{type:'application/json'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download='pookie_answers.json'; a.click(); a.remove();});
-
-// Initialize
 renderAll();
+
+document.getElementById('curtainOverlay').addEventListener('click',function(){
+  this.style.transition='opacity .7s ease';
+  this.style.opacity='0';
+  setTimeout(()=>{ this.style.display='none'; if(state.progress<1) state.progress=1; saveState(); renderAll(); },750);
+});
 </script>
 </body>
 </html>
