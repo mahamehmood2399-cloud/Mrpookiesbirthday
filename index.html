@@ -1,8 +1,8 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Pookie Cookie — Magical Countdown</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&display=swap');
@@ -13,13 +13,13 @@
   --muted:#E6D9B8;
   --accent:#ff7aa2;
 }
-*{box-sizing:border-box}
-body{margin:0;height:100%;font-family:'Inter',sans-serif;background:linear-gradient(135deg,#0b0020,#1a0030,#0b0020);color:var(--muted);overflow-x:hidden;transition:background 1.5s linear}
-.wrap{max-width:920px;margin:0 auto;padding:24px}
-header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
-h1{margin:0;color:var(--gold);font-size:1.5rem;font-weight:800}
-.sub{color:#cdbf93;font-size:0.95rem;margin-top:6px}
 
+*{box-sizing:border-box;}
+body{margin:0;height:100%;font-family:'Inter',sans-serif;background:linear-gradient(135deg,#0b0020,#1a0030,#0b0020);color:var(--muted);overflow-x:hidden;transition:background 1.5s linear;}
+.wrap{max-width:920px;margin:0 auto;padding:24px;}
+header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;}
+h1{margin:0;color:var(--gold);font-size:1.5rem;font-weight:800;}
+.sub{color:#cdbf93;font-size:0.95rem;margin-top:6px;}
 .card{
   background: rgba(20,0,30,0.85);
   border-radius: 16px;
@@ -32,11 +32,10 @@ h1{margin:0;color:var(--gold);font-size:1.5rem;font-weight:800}
   overflow: hidden;
 }
 .card:hover{transform: translateY(-4px) scale(1.02);box-shadow:0 20px 40px rgba(212,175,55,0.35);}
-.pageTitle{font-weight:800;color:var(--gold);font-size:1.1rem;margin-bottom:6px}
-.message{margin-top:10px;font-size:0.96rem;line-height:1.45}
-.riddle{margin-top:12px;padding:12px;border-radius:10px;background:rgba(212,175,55,0.06);font-style:italic;color:#f7efd6}
-
-.reveal,.choices{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;z-index:2;position:relative}
+.pageTitle{font-weight:800;color:var(--gold);font-size:1.1rem;margin-bottom:6px;}
+.message{margin-top:10px;font-size:0.96rem;line-height:1.45;}
+.riddle{margin-top:12px;padding:12px;border-radius:10px;background:rgba(212,175,55,0.06);font-style:italic;color:#f7efd6;}
+.reveal,.choices{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;z-index:2;position:relative;}
 .choice{
   flex:1 1 120px;
   padding:14px 20px;
@@ -55,13 +54,12 @@ h1{margin:0;color:var(--gold);font-size:1.5rem;font-weight:800}
   gap:6px;
 }
 .choice:hover{transform:scale(1.08) rotate(-1deg);box-shadow:0 12px 24px rgba(255,223,150,0.7);}
-.choice span.emoji{font-size:1.3rem}
-
-.small{font-size:0.82rem;color:#bfb38a;margin-top:10px}
-#progressDots{display:flex;gap:6px;margin-top:12px}
-.dot{width:12px;height:12px;border-radius:50%;background:rgba(212,175,55,0.18);box-shadow:0 4px 12px rgba(0,0,0,0.6);transition:all .25s ease}
-.dot.active{background:var(--gold);animation:pulseDot 1.2s infinite alternate}
-@keyframes pulseDot{0%{transform:scale(1)}50%{transform:scale(1.4)}100%{transform:scale(1)}}
+.choice span.emoji{font-size:1.3rem;}
+.small{font-size:0.82rem;color:#bfb38a;margin-top:10px;}
+#progressDots{display:flex;gap:6px;margin-top:12px;}
+.dot{width:12px;height:12px;border-radius:50%;background:rgba(212,175,55,0.18);box-shadow:0 4px 12px rgba(0,0,0,0.6);transition:all .25s ease;}
+.dot.active{background:var(--gold);animation:pulseDot 1.2s infinite alternate;}
+@keyframes pulseDot{0%{transform:scale(1)}50%{transform:scale(1.4)}100%{transform:scale(1)};}
 
 #curtainOverlay{
   position:fixed;left:0;top:0;width:100vw;height:100vh;z-index:9999;display:flex;align-items:center;justify-content:center;
@@ -69,16 +67,16 @@ h1{margin:0;color:var(--gold);font-size:1.5rem;font-weight:800}
   overflow:hidden;flex-direction:column;color:var(--muted);text-align:center;
   cursor:pointer;
 }
-#curtainText{font-size:28px;font-weight:800;color:var(--gold);padding:12px;pointer-events:none}
-#curtainSparkles{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none}
+#curtainText{font-size:28px;font-weight:800;color:var(--gold);padding:12px;pointer-events:none;}
+#curtainSparkles{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;}
 
 #adminToggle,#exportBtn{
   position:fixed;bottom:14px;padding:10px 12px;border-radius:12px;cursor:pointer;background:rgba(255,255,255,0.06);color:var(--gold);
   font-weight:700;z-index:10000;transition:transform 0.2s ease,box-shadow 0.2s ease;
 }
-#adminToggle:hover,#exportBtn:hover{transform:scale(1.05);box-shadow:0 8px 20px rgba(255,215,0,0.6)}
+#adminToggle:hover,#exportBtn:hover{transform:scale(1.05);box-shadow:0 8px 20px rgba(255,215,0,0.6);}
 
-#fireworksCanvas{position:fixed;left:0;top:0;width:100%;height:100%;pointer-events:none;display:none;z-index:9998}
+#fireworksCanvas{position:fixed;left:0;top:0;width:100%;height:100%;pointer-events:none;display:none;z-index:9998;}
 </style>
 </head>
 <body>
@@ -118,7 +116,7 @@ h1{margin:0;color:var(--gold);font-size:1.5rem;font-weight:800}
 <script src="https://www.gstatic.com/firebasejs/11.30.0/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/11.30.0/firebase-database.js"></script>
 <script>
-// Firebase setup
+// ====== Firebase ======
 const firebaseConfig = {
   apiKey: "AIzaSyAxrxUO86_bBRWvG7MPPEiplyMZcP_BBaw",
   authDomain: "mr-pookie-birthday.firebaseapp.com",
@@ -132,7 +130,9 @@ firebase.initializeApp(firebaseConfig);
 const database = firebase.database();
 function saveToFirebase(blockIdx,key,value){ firebase.database().ref(`answers/block${blockIdx}/${key}`).set(value).catch(console.error); }
 
-// Block data
+// ====== State ======
+let state=JSON.parse(localStorage.getItem('pookie_full_state_v1')||'{"progress":0,"answers":{}}');
+let adminMode=localStorage.getItem('pookie_admin')==='1';
 const BLOCK_DATES=["2025-12-01","2025-12-05","2025-12-10","2025-12-15","2025-12-20","2025-12-25","2025-12-30"];
 const BLOCK_CONTENT=[
   {title:"Days 1–4",intro:"Hello Pookie Cookie 🌞",message:"You make the day sweeter just by being you.",riddle:"I have keys but no locks. What am I?",questions:[{k:"mood1",q:"Pick your vibe today!",opts:["😎 Playful","🌸 Smooth","😏 Cheeky"]}]},
@@ -144,20 +144,19 @@ const BLOCK_CONTENT=[
   {title:"Day 30",intro:"Final reveal 🎆",message:"Celebrate YOU!",riddle:"Final riddle: What ends everything?",questions:[{k:"finalMood7",q:"Final mood:",opts:["🕯️ Candle-lit","🎉 Playful bash"]}]}
 ];
 
-let state=JSON.parse(localStorage.getItem('pookie_full_state_v1')||'{"progress":0,"answers":{}}');
-let adminMode=localStorage.getItem('pookie_admin')==='1';
+// ====== Helpers ======
 function getKarachiDateStr(){ const now=new Date(); const utcMs=now.getTime()+(now.getTimezoneOffset()*60000); const tzMs=5*60*60*1000; return new Date(utcMs+tzMs).toISOString().slice(0,10);}
 function isDateReached(index){return getKarachiDateStr()>=BLOCK_DATES[index];}
-
 const pagesEl=document.getElementById('pages');
 const progressDots=document.getElementById('progressDots');
 function saveState(){ localStorage.setItem('pookie_full_state_v1',JSON.stringify(state)); }
 function renderProgressDots(){progressDots.innerHTML='';for(let i=0;i<BLOCK_CONTENT.length;i++){const dot=document.createElement('div');dot.className='dot'+((adminMode||(i+1<=state.progress)||isDateReached(i)?' active':''));progressDots.appendChild(dot);}}
 
+// ====== Render ======
 function renderAll(){
   pagesEl.innerHTML=''; renderProgressDots();
-  for(let i=0;i<BLOCK_CONTENT.length;i++){
-    const idx=i+1; const content=BLOCK_CONTENT[i];
+  BLOCK_CONTENT.forEach((content,i)=>{
+    const idx=i+1;
     const dateUnlocked=isDateReached(i);
     const unlocked=adminMode||dateUnlocked||(idx<=state.progress);
     const section=document.createElement('section');
@@ -173,10 +172,7 @@ function renderAll(){
     const riddle=document.createElement('div'); riddle.className='riddle'; riddle.textContent='Riddle — '+content.riddle;
     section.appendChild(riddle);
 
-    const revealBtn=document.createElement('button'); revealBtn.className='revealBtn'; revealBtn.textContent=unlocked?'Open this block':'Locked';
-    if(!unlocked) revealBtn.disabled=true; section.appendChild(revealBtn);
-
-    const interactive=document.createElement('div'); interactive.className='hidden'; interactive.id=`interactive-${idx}`;
+    const interactive=document.createElement('div'); interactive.id=`interactive-${idx}`;
     content.questions.forEach(q=>{
       const qWrap=document.createElement('div'); qWrap.style.marginTop='12px';
       const qText=document.createElement('div'); qText.style.fontWeight='800'; qText.style.marginBottom='8px'; qText.textContent=q.q;
@@ -189,17 +185,25 @@ function renderAll(){
       });
       qWrap.appendChild(row); interactive.appendChild(qWrap);
     });
+    interactive.style.display='none';
     section.appendChild(interactive);
+
+    const revealBtn=document.createElement('button'); revealBtn.className='revealBtn'; revealBtn.textContent=unlocked?'Open this block':'Locked';
+    if(!unlocked) revealBtn.disabled=true;
     revealBtn.addEventListener('click',()=>{interactive.style.display=interactive.style.display==='block'?'none':'block'; if(state.progress<idx+1) state.progress=idx+1; saveState(); renderProgressDots();});
+    section.appendChild(revealBtn);
+
     pagesEl.appendChild(section);
-  }
+  });
 }
 renderAll();
 
-document.getElementById('curtainOverlay').addEventListener('click',function(){
-  this.style.transition='opacity .7s ease';
-  this.style.opacity='0';
-  setTimeout(()=>{ this.style.display='none'; if(state.progress<1) state.progress=1; saveState(); renderAll(); },750);
+// ====== Curtain tap ======
+const curtain=document.getElementById('curtainOverlay');
+curtain.addEventListener('click',()=>{
+  curtain.style.transition='opacity 0.7s ease';
+  curtain.style.opacity='0';
+  setTimeout(()=>{ curtain.style.display='none'; if(state.progress<1) state.progress=1; saveState(); renderAll(); },750);
 });
 </script>
 </body>
