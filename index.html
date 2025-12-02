@@ -63,7 +63,7 @@ button:hover{transform:scale(1.05);}
 
 <script>
 /* ===========================
-   CONFIGURATION (unchanged)
+   CONFIGURATION
 =========================== */
 const DAYS = [
   {day:1,title:"Day 1: Gift Choices",questions:[
@@ -111,11 +111,10 @@ const HEARTFELT_MESSAGES = [
 ];
 
 /* ===========================
-   STATE + LOCKS (added)
+   STATE
 =========================== */
 let currentDay = 0;
 let answers = {};
-let dayUnlocked = [true, false, false, false, false, false];
 
 /* ===========================
    START COUNTDOWN
@@ -127,24 +126,12 @@ function startCountdown(){
 }
 
 /* ===========================
-   RENDER DAY (modified ONLY to add locks)
+   UI RENDER
 =========================== */
 const container = document.getElementById("pagesContainer");
 
 function showDay(dayIdx){
   container.innerHTML = "";
-
-  if(!dayUnlocked[dayIdx]){
-    const lockCard = document.createElement("div");
-    lockCard.className = "card";
-    lockCard.innerHTML = `
-      <h2>🔒 This day is locked</h2>
-      <p>You need to finish the previous day first, my love 💙</p>
-    `;
-    container.appendChild(lockCard);
-    return;
-  }
-
   const day = DAYS[dayIdx];
   const card = document.createElement("div");
   card.className="card";
@@ -152,8 +139,6 @@ function showDay(dayIdx){
   const title = document.createElement("h2");
   title.textContent = day.title;
   card.appendChild(title);
-
-  let answeredSomething = false;
 
   day.questions.forEach((q,i)=>{
     const qDiv = document.createElement("div");
@@ -175,8 +160,6 @@ function showDay(dayIdx){
         btn.addEventListener("click",()=>{
           answers[`day${day.day}-${i}`]=opt;
           msgDiv.textContent=chooseMessage();
-          answeredSomething = true;
-          unlockBtn.classList.remove("hidden");
         });
         qDiv.appendChild(btn);
       });
@@ -190,28 +173,12 @@ function showDay(dayIdx){
       input.addEventListener("input",()=>{
         answers[`day${day.day}-${i}`]=input.value;
         msgDiv.textContent=chooseMessage();
-        answeredSomething = true;
-        unlockBtn.classList.remove("hidden");
       });
       qDiv.appendChild(input);
     }
 
     card.appendChild(qDiv);
   });
-
-  const unlockBtn = document.createElement("button");
-  unlockBtn.textContent = "Unlock Next Day ✨";
-  unlockBtn.classList.add("hidden");
-  unlockBtn.style.marginTop = "15px";
-  unlockBtn.addEventListener("click",()=>{
-    if(dayUnlocked[dayIdx+1] === false){
-      dayUnlocked[dayIdx+1] = true;
-    }
-    currentDay = dayIdx + 1;
-    showDay(currentDay);
-  });
-
-  card.appendChild(unlockBtn);
 
   const navDiv = document.createElement("div");
   navDiv.className="nav";
@@ -223,19 +190,12 @@ function showDay(dayIdx){
     navDiv.appendChild(prevBtn);
   }
 
-  if(dayIdx < DAYS.length - 1){
+  if(dayIdx<DAYS.length-1){
     const nextBtn = document.createElement("button");
     nextBtn.textContent="Next Day ➡";
-    nextBtn.addEventListener("click",()=>{
-      if(!dayUnlocked[dayIdx+1]){
-        alert("Hehe not yet Pookie 😌 finish this day first 💙");
-        return;
-      }
-      currentDay++;
-      showDay(currentDay);
-    });
+    nextBtn.addEventListener("click",()=>{currentDay++; showDay(currentDay);});
     navDiv.appendChild(nextBtn);
-  } else {
+  }else{
     const finishBtn = document.createElement("button");
     finishBtn.textContent="🎆 Celebrate!";
     finishBtn.addEventListener("click",startFireworks);
@@ -247,7 +207,7 @@ function showDay(dayIdx){
 }
 
 /* ===========================
-   MESSAGE PICKER (unchanged)
+   MESSAGE PICKER
 =========================== */
 function chooseMessage(){
   const pool = Math.random()<0.6 ? PLAYFUL_MESSAGES : HEARTFELT_MESSAGES;
@@ -255,7 +215,7 @@ function chooseMessage(){
 }
 
 /* ===========================
-   FIREWORKS (unchanged)
+   FIREWORKS
 =========================== */
 const fwCanvas=document.getElementById("fireworksCanvas");
 const fctx=fwCanvas.getContext("2d"); let W,H;
@@ -276,6 +236,9 @@ class PART{ constructor(x,y,c){ this.x=x; this.y=y; this.c=c; this.v=R(1,6); thi
 function animateFW(){ fctx.clearRect(0,0,W,H); if(Math.random()<0.06) fw.push(new FW()); fw=fw.filter(x=>!x.update()); parts=parts.filter(p=>!p.update()); requestAnimationFrame(animateFW); }
 function startFireworks(){ fwCanvas.style.display='block'; animateFW(); }
 
+/* ===========================
+   INIT
+=========================== */
 </script>
 </body>
 </html>
