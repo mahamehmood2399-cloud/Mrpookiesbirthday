@@ -3,413 +3,242 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pookie Cookie — Magical Birthday Countdown</title>
+<title>Hello Mr. Pookie Cookie 💖 — Magical Countdown</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&display=swap');
-
 :root{
-  --bg:#f0f8ff;
-  --primary:#1e3a8a;
-  --accent:#60a5fa;
-  --muted:#333;
-  --gold:#ffd700;
+  --bg:#e0f7ff; 
+  --primary:#00aaff;
+  --secondary:#ffffff;
+  --accent:#ff69b4;
+  --text:#1a1a1a;
+  --card:#ffffff;
 }
+*{box-sizing:border-box;}
+body{margin:0;font-family:Arial, sans-serif;background:var(--bg);color:var(--text);}
+.wrap{max-width:800px;margin:0 auto;padding:20px;}
+h1,h2{margin:0 0 10px 0;}
+h1{color:var(--primary);text-align:center;font-size:1.8rem;}
+.card{background:var(--card);border-radius:15px;padding:20px;margin:20px 0;box-shadow:0 6px 18px rgba(0,0,0,0.1);}
+button{background:var(--primary);color:var(--secondary);border:none;padding:12px 18px;margin:5px;border-radius:12px;font-weight:700;cursor:pointer;transition:all 0.3s;}
+button:hover{transform:scale(1.05);}
+.message{margin-top:15px;font-weight:700;min-height:50px;}
+.hidden{display:none;}
+.nav{display:flex;justify-content:space-between;margin-top:10px;}
+.nav button{background:var(--accent);}
+.fireworksCanvas{position:fixed;left:0;top:0;width:100%;height:100%;pointer-events:none;display:none;z-index:9999;}
 
-body {
-  margin:0;
-  height:100%;
-  font-family:'Inter',sans-serif;
-  background: linear-gradient(135deg,#e0f2fe,#bae6fd);
-  color: var(--muted);
-  overflow: hidden;
-}
-
-.wrap {
-  max-width:800px;
-  margin:0 auto;
-  padding:24px;
-  height:100vh;
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  align-items:center;
-  position:relative;
-}
-
-.page {
-  background:white;
-  border-radius:20px;
-  padding:30px;
-  box-shadow:0 10px 30px rgba(0,0,0,0.2);
+/* Intro card style */
+.introText{
+  font-size:1rem;
+  margin-top:10px;
   text-align:center;
-  width:100%;
-  max-width:600px;
-  display:none;
-  flex-direction:column;
-  animation:fadeIn 0.5s ease forwards;
+  line-height:1.5;
 }
-
-.page.active { display:flex; }
-
-.page h1 { color: var(--primary); font-size:1.8rem; margin-bottom:10px; }
-.page p { font-size:1.1rem; margin:10px 0; }
-.page .riddle { font-style:italic; color:#555; margin:15px 0; }
-.page .reveal { display:flex; flex-wrap:wrap; gap:12px; justify-content:center; margin-top:15px; }
-.page button.choice {
-  background:var(--accent); color:white; border:none; padding:12px 20px; border-radius:12px;
-  cursor:pointer; font-weight:700; font-size:1rem; transition:all 0.2s ease;
-  display:flex; align-items:center; justify-content:center; gap:6px;
-}
-.page button.choice:hover { transform:scale(1.05) rotate(-1deg); box-shadow:0 6px 18px rgba(30,58,138,0.6);}
-.page .tease { margin-top:12px; font-weight:700; font-size:0.95rem; color:var(--primary);}
-.page .navBtn {
-  margin-top:20px; padding:12px 24px; border:none; border-radius:14px;
-  background:var(--primary); color:white; font-weight:800; cursor:pointer; transition:all 0.2s ease;
-}
-.page .navBtn:hover { transform:scale(1.05);}
-@keyframes fadeIn { from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);} }
 </style>
 </head>
 <body>
 <div class="wrap">
+  <h1>Hello Mr. Pookie Cookie 💖</h1>
 
-<!-- Pages -->
-<div class="page" id="page0">
-  <h1>✨ Hello Mr. Pookie Cookie 💙</h1>
-  <p>Tap the button below to start your magical birthday surprises! 🎉</p>
-  <button class="navBtn" onclick="nextPage(1)">Open the Magic 🪄</button>
-</div>
-
-<div class="page" id="page1">
-  <h1>Day 1–5 🎁</h1>
-  <p>Good morning! Let's start with a gift choice 🥳</p>
-  <div class="reveal">
-    <button class="choice" onclick="saveAnswer(1,'gift','Gift Box');showTease('Gift Box')">🎁 Gift Box</button>
-    <button class="choice" onclick="saveAnswer(1,'gift','Gift Card');showTease('Gift Card')">💳 Gift Card</button>
+  <!-- INTRO PAGE -->
+  <div id="introPage" class="card">
+    <h2>Welcome, my favorite human 💫</h2>
+    <p class="introText">
+      I made this little countdown just for you… because you’re the person who makes my days softer, my heart warmer, and my life feel 
+      a whole lot sweeter 💖  
+      <br><br>
+      You're my comfort person — the one I can always run to, the one who makes me smile without trying, the one who feels like home ✨  
+      <br><br>
+      This whole thing is my way of giving you a tiny piece of the joy you give me every day 💙  
+    </p>
+    <div style="text-align:center;margin-top:20px;">
+      <button onclick="startCountdown()">Start Your Countdown ➜</button>
+    </div>
   </div>
-  <div class="tease" id="tease1"></div>
-  <button class="navBtn" onclick="nextPage(2)">Next Day ➡️</button>
+
+  <div id="pagesContainer" class="hidden"></div>
 </div>
 
-<div class="page" id="page2">
-  <h1>Day 6–10 🌟</h1>
-  <p>Pick a fun mood today! 😎</p>
-  <div class="reveal">
-    <button class="choice" onclick="saveAnswer(2,'mood','Playful');showTease('Playful')">😎 Playful</button>
-    <button class="choice" onclick="saveAnswer(2,'mood','Flirty');showTease('Flirty')">😘 Flirty</button>
-    <button class="choice" onclick="saveAnswer(2,'mood','Cheeky');showTease('Cheeky')">😏 Cheeky</button>
-  </div>
-  <div class="tease" id="tease2"></div>
-  <button class="navBtn" onclick="nextPage(3)">Next Day ➡️</button>
-</div>
-
-<div class="page" id="page3">
-  <h1>Day 11–15 🎉</h1>
-  <p>Let's add a flirty compliment 💖</p>
-  <div class="reveal">
-    <button class="choice" onclick="saveAnswer(3,'compliment','You are amazing!');showTease('You are amazing!')">💫 You are amazing!</button>
-    <button class="choice" onclick="saveAnswer(3,'compliment','Your smile is magical');showTease('Your smile is magical')">😊 Your smile is magical</button>
-    <button class="choice" onclick="saveAnswer(3,'compliment','You are a star');showTease('You are a star')">⭐ You are a star</button>
-  </div>
-  <div class="tease" id="tease3"></div>
-  <button class="navBtn" onclick="nextPage(4)">Next Day ➡️</button>
-</div>
-
-<div class="page" id="page4">
-  <h1>Day 16–20 🎂</h1>
-  <p>Time for a playful challenge! 🎲</p>
-  <div class="reveal">
-    <button class="choice" onclick="saveAnswer(4,'challenge','Dance');showTease('Dance like a star!')">💃 Dance</button>
-    <button class="choice" onclick="saveAnswer(4,'challenge','Sing');showTease('Sing your heart out!')">🎤 Sing</button>
-    <button class="choice" onclick="saveAnswer(4,'challenge','Joke');showTease('Tell a funny joke!')">😂 Joke</button>
-  </div>
-  <div class="tease" id="tease4"></div>
-  <button class="navBtn" onclick="nextPage(5)">Next Day ➡️</button>
-</div>
-
-<div class="page" id="page5">
-  <h1>Day 21–25 🎊</h1>
-  <p>Pick your birthday surprise! 🎁</p>
-  <div class="reveal">
-    <button class="choice" onclick="saveAnswer(5,'surprise','Cake');showTease('Sweet cake incoming!')">🍰 Cake</button>
-    <button class="choice" onclick="saveAnswer(5,'surprise','Balloon');showTease('Balloons everywhere!')">🎈 Balloon</button>
-    <button class="choice" onclick="saveAnswer(5,'surprise','Confetti');showTease('Confetti blast!')">🎉 Confetti</button>
-  </div>
-  <div class="tease" id="tease5"></div>
-  <button class="navBtn" onclick="nextPage(6)">Next Day ➡️</button>
-</div>
-
-<div class="page" id="page6">
-  <h1>Final Day 🎆</h1>
-  <p>Celebrate YOU today! 🥳</p>
-  <div class="reveal">
-    <button class="choice" onclick="saveAnswer(6,'final','Candle-lit');showTease('A romantic candle-lit vibe!')">🕯️ Candle-lit</button>
-    <button class="choice" onclick="saveAnswer(6,'final','Party');showTease('Let’s have a playful party!')">🎉 Party</button>
-  </div>
-  <div class="tease" id="tease6"></div>
-  <button class="navBtn" onclick="exportAnswers()">Export 🎁</button>
-</div>
-
-</div>
+<canvas id="fireworksCanvas" class="fireworksCanvas"></canvas>
 
 <script>
-// ===== State =====
-let answers = JSON.parse(localStorage.getItem('pookie_answers')||'{}');
-
-// Nicknames for teasing
-const nicknames = [
-  'Beef Steak 🥩','Rafaello 🍬','Cadbury 🍫','Full Course Meal 🍽️','Mr. Buttery 🧈',
-  'Sexy 😏','Sexy Pookie 😘','Pookie Vampire 🧛','Hot & Spicy Meal 🌶️','Perfect Dessert 🍰'
+/* ===========================
+   CONFIGURATION
+=========================== */
+const DAYS = [
+  {day:1,title:"Day 1: Gift Choices",questions:[
+    {q:"Pick your gift:",type:"choice",options:["Gift Box 🎁","Gift Card 💳"]}
+  ]},
+  {day:2,title:"Day 2: Mood & Tease",questions:[
+    {q:"Pick your vibe:",type:"choice",options:["Playful 😎","Smooth 😏"]},
+    {q:"Do you want a cheeky tease or gentle tease?",type:"choice",options:["Cheeky 😈","Gentle ✨"]}
+  ]},
+  {day:3,title:"Day 3: Nickname Fun",questions:[
+    {q:"Which nickname do you want me to tease you with?",type:"choice",options:["Beef Steak 🥩","Rafaello 🍬","Cadbury 🍫","Full Course Meal 🍽️"]},
+    {q:"Pick a compliment:",type:"choice",options:["Sexy 💖","Sexy Pookie 💙","Pookie Vampire 🧁","Hot & Spicy Meal 🌶️","Perfect Dessert 🍰"]}
+  ]},
+  {day:4,title:"Day 4: Flirty Challenge",questions:[
+    {q:"Want a playful quiz or silly dare?",type:"choice",options:["Quiz 📝","Dare 🎲"]},
+    {q:"Pick a mood:",type:"choice",options:["Romantic 💖","Adventurous 🌟"]}
+  ]},
+  {day:5,title:"Day 5: Surprise Prep",questions:[
+    {q:"Gift preference?",type:"choice",options:["Option A 🎁","Option B 💝"]},
+    {q:"Car mood?",type:"choice",options:["Option A 🚗","Option B 🚙"]}
+  ]},
+  {day:6,title:"Day 6: Birthday Finale",questions:[
+    {q:"Final mood?",type:"choice",options:["Candle-lit 💖","Playful Bash 🎉"]},
+    {q:"One tiny promise for your birthday?",type:"text"}
+  ]}
 ];
 
-// Save answer
-function saveAnswer(page,key,value){
-  answers['page'+page] = answers['page'+page]||{};
-  answers['page'+page][key]=value;
-  localStorage.setItem('pookie_answers',JSON.stringify(answers));
-}
-
-// Navigation
-let currentPage=0;
-function nextPage(id){
-  document.getElementById('page'+currentPage).classList.remove('active');
-  currentPage=id;
-  document.getElementById('page'+currentPage).classList.add('active');
-}
-
-// Show teasing message
-function showTease(text){
-  const teaseId='tease'+currentPage;
-  const el=document.getElementById(teaseId);
-  if(el){
-    const randomNick=nicknames[Math.floor(Math.random()*nicknames.length)];
-    const funEmojis=['💖','😏','🥳','✨','😍','😎','🎉','💫'];
-    const randomEmoji=funEmojis[Math.floor(Math.random()*funEmojis.length)];
-    el.textContent=`${randomEmoji} Hey ${randomNick}! ${text} ${randomEmoji}`;
-  }
-}
-
-// Export answers
-function exportAnswers(){
-  const data=JSON.stringify(answers,null,2);
-  const blob=new Blob([data],{type:'application/json'});
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement('a');
-  a.href=url;
-  a.download='pookie_answers.json';
-  a.click();
-  a.remove();
-}
-
-// Init
-nextPage(0);
-</script>
-</body>
-</html><!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pookie Cookie — Magical Birthday Countdown</title>
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&display=swap');
-
-:root{
-  --bg:#f0f8ff;
-  --primary:#1e3a8a;
-  --accent:#60a5fa;
-  --muted:#333;
-  --gold:#ffd700;
-}
-
-body {
-  margin:0;
-  height:100%;
-  font-family:'Inter',sans-serif;
-  background: linear-gradient(135deg,#e0f2fe,#bae6fd);
-  color: var(--muted);
-  overflow: hidden;
-}
-
-.wrap {
-  max-width:800px;
-  margin:0 auto;
-  padding:24px;
-  height:100vh;
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  align-items:center;
-  position:relative;
-}
-
-.page {
-  background:white;
-  border-radius:20px;
-  padding:30px;
-  box-shadow:0 10px 30px rgba(0,0,0,0.2);
-  text-align:center;
-  width:100%;
-  max-width:600px;
-  display:none;
-  flex-direction:column;
-  animation:fadeIn 0.5s ease forwards;
-}
-
-.page.active { display:flex; }
-
-.page h1 { color: var(--primary); font-size:1.8rem; margin-bottom:10px; }
-.page p { font-size:1.1rem; margin:10px 0; }
-.page .riddle { font-style:italic; color:#555; margin:15px 0; }
-.page .reveal { display:flex; flex-wrap:wrap; gap:12px; justify-content:center; margin-top:15px; }
-.page button.choice {
-  background:var(--accent); color:white; border:none; padding:12px 20px; border-radius:12px;
-  cursor:pointer; font-weight:700; font-size:1rem; transition:all 0.2s ease;
-  display:flex; align-items:center; justify-content:center; gap:6px;
-}
-.page button.choice:hover { transform:scale(1.05) rotate(-1deg); box-shadow:0 6px 18px rgba(30,58,138,0.6);}
-.page .tease { margin-top:12px; font-weight:700; font-size:0.95rem; color:var(--primary);}
-.page .navBtn {
-  margin-top:20px; padding:12px 24px; border:none; border-radius:14px;
-  background:var(--primary); color:white; font-weight:800; cursor:pointer; transition:all 0.2s ease;
-}
-.page .navBtn:hover { transform:scale(1.05);}
-@keyframes fadeIn { from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);} }
-</style>
-</head>
-<body>
-<div class="wrap">
-
-<!-- Pages -->
-<div class="page" id="page0">
-  <h1>✨ Hello Mr. Pookie Cookie 💙</h1>
-  <p>Tap the button below to start your magical birthday surprises! 🎉</p>
-  <button class="navBtn" onclick="nextPage(1)">Open the Magic 🪄</button>
-</div>
-
-<div class="page" id="page1">
-  <h1>Day 1–5 🎁</h1>
-  <p>Good morning! Let's start with a gift choice 🥳</p>
-  <div class="reveal">
-    <button class="choice" onclick="saveAnswer(1,'gift','Gift Box');showTease('Gift Box')">🎁 Gift Box</button>
-    <button class="choice" onclick="saveAnswer(1,'gift','Gift Card');showTease('Gift Card')">💳 Gift Card</button>
-  </div>
-  <div class="tease" id="tease1"></div>
-  <button class="navBtn" onclick="nextPage(2)">Next Day ➡️</button>
-</div>
-
-<div class="page" id="page2">
-  <h1>Day 6–10 🌟</h1>
-  <p>Pick a fun mood today! 😎</p>
-  <div class="reveal">
-    <button class="choice" onclick="saveAnswer(2,'mood','Playful');showTease('Playful')">😎 Playful</button>
-    <button class="choice" onclick="saveAnswer(2,'mood','Flirty');showTease('Flirty')">😘 Flirty</button>
-    <button class="choice" onclick="saveAnswer(2,'mood','Cheeky');showTease('Cheeky')">😏 Cheeky</button>
-  </div>
-  <div class="tease" id="tease2"></div>
-  <button class="navBtn" onclick="nextPage(3)">Next Day ➡️</button>
-</div>
-
-<div class="page" id="page3">
-  <h1>Day 11–15 🎉</h1>
-  <p>Let's add a flirty compliment 💖</p>
-  <div class="reveal">
-    <button class="choice" onclick="saveAnswer(3,'compliment','You are amazing!');showTease('You are amazing!')">💫 You are amazing!</button>
-    <button class="choice" onclick="saveAnswer(3,'compliment','Your smile is magical');showTease('Your smile is magical')">😊 Your smile is magical</button>
-    <button class="choice" onclick="saveAnswer(3,'compliment','You are a star');showTease('You are a star')">⭐ You are a star</button>
-  </div>
-  <div class="tease" id="tease3"></div>
-  <button class="navBtn" onclick="nextPage(4)">Next Day ➡️</button>
-</div>
-
-<div class="page" id="page4">
-  <h1>Day 16–20 🎂</h1>
-  <p>Time for a playful challenge! 🎲</p>
-  <div class="reveal">
-    <button class="choice" onclick="saveAnswer(4,'challenge','Dance');showTease('Dance like a star!')">💃 Dance</button>
-    <button class="choice" onclick="saveAnswer(4,'challenge','Sing');showTease('Sing your heart out!')">🎤 Sing</button>
-    <button class="choice" onclick="saveAnswer(4,'challenge','Joke');showTease('Tell a funny joke!')">😂 Joke</button>
-  </div>
-  <div class="tease" id="tease4"></div>
-  <button class="navBtn" onclick="nextPage(5)">Next Day ➡️</button>
-</div>
-
-<div class="page" id="page5">
-  <h1>Day 21–25 🎊</h1>
-  <p>Pick your birthday surprise! 🎁</p>
-  <div class="reveal">
-    <button class="choice" onclick="saveAnswer(5,'surprise','Cake');showTease('Sweet cake incoming!')">🍰 Cake</button>
-    <button class="choice" onclick="saveAnswer(5,'surprise','Balloon');showTease('Balloons everywhere!')">🎈 Balloon</button>
-    <button class="choice" onclick="saveAnswer(5,'surprise','Confetti');showTease('Confetti blast!')">🎉 Confetti</button>
-  </div>
-  <div class="tease" id="tease5"></div>
-  <button class="navBtn" onclick="nextPage(6)">Next Day ➡️</button>
-</div>
-
-<div class="page" id="page6">
-  <h1>Final Day 🎆</h1>
-  <p>Celebrate YOU today! 🥳</p>
-  <div class="reveal">
-    <button class="choice" onclick="saveAnswer(6,'final','Candle-lit');showTease('A romantic candle-lit vibe!')">🕯️ Candle-lit</button>
-    <button class="choice" onclick="saveAnswer(6,'final','Party');showTease('Let’s have a playful party!')">🎉 Party</button>
-  </div>
-  <div class="tease" id="tease6"></div>
-  <button class="navBtn" onclick="exportAnswers()">Export 🎁</button>
-</div>
-
-</div>
-
-<script>
-// ===== State =====
-let answers = JSON.parse(localStorage.getItem('pookie_answers')||'{}');
-
-// Nicknames for teasing
-const nicknames = [
-  'Beef Steak 🥩','Rafaello 🍬','Cadbury 🍫','Full Course Meal 🍽️','Mr. Buttery 🧈',
-  'Sexy 😏','Sexy Pookie 😘','Pookie Vampire 🧛','Hot & Spicy Meal 🌶️','Perfect Dessert 🍰'
+const PLAYFUL_MESSAGES = [
+  "Ooo Beef Steak 🥩… look at you, all juicy and irresistible 😍 I swear, every time I see you I just wanna take a big bite 💫",
+  "Cadbury 🍫, you’re so sweet I could melt in your arms ✨ Every glance from you makes me weak 💛",
+  "Full Course Meal 🍽️… rich, smooth, indulgent 😋 I could spend hours savoring every part 💫",
+  "Sexy Pookie 💙, every inch of you is sinful 💫 I might need a fork and knife 😍 You’re impossible to resist!",
+  "Hot & Spicy Meal 🌶️… setting the temperature way too high 🔥 I’m trying to behave but failing 😍",
+  "Mr. Buttery 💛… smooth and indulgent 😋 Keep teasing me, you little heartbreaker!",
+  "Pookie Vampire 🧁… your sweetness is dangerous 💫 I can’t resist you 😍 Every move drains my willpower!",
+  "Perfect Dessert 🍰… every glance makes me melt 😋 Handcrafted for maximum temptation ✨"
 ];
 
-// Save answer
-function saveAnswer(page,key,value){
-  answers['page'+page] = answers['page'+page]||{};
-  answers['page'+page][key]=value;
-  localStorage.setItem('pookie_answers',JSON.stringify(answers));
+const HEARTFELT_MESSAGES = [
+  "You’re my comfort person 💖 Every moment with you feels like home ✨ I feel so safe and happy with you 💫",
+  "I feel so lucky to have you 💫 You make everything better 💖",
+  "Just seeing your smile lights up my day ✨💖",
+  "Being with you feels like the coziest blanket 💖 Warm, safe, and perfect 💫 I’m so grateful for you 💖",
+  "Honestly… you’re my favorite human 💖 Just having you around makes everything brighter 💫"
+];
+
+/* ===========================
+   STATE
+=========================== */
+let currentDay = 0;
+let answers = {};
+
+/* ===========================
+   START COUNTDOWN
+=========================== */
+function startCountdown(){
+  document.getElementById("introPage").classList.add("hidden");
+  document.getElementById("pagesContainer").classList.remove("hidden");
+  showDay(currentDay);
 }
 
-// Navigation
-let currentPage=0;
-function nextPage(id){
-  document.getElementById('page'+currentPage).classList.remove('active');
-  currentPage=id;
-  document.getElementById('page'+currentPage).classList.add('active');
-}
+/* ===========================
+   UI RENDER
+=========================== */
+const container = document.getElementById("pagesContainer");
 
-// Show teasing message
-function showTease(text){
-  const teaseId='tease'+currentPage;
-  const el=document.getElementById(teaseId);
-  if(el){
-    const randomNick=nicknames[Math.floor(Math.random()*nicknames.length)];
-    const funEmojis=['💖','😏','🥳','✨','😍','😎','🎉','💫'];
-    const randomEmoji=funEmojis[Math.floor(Math.random()*funEmojis.length)];
-    el.textContent=`${randomEmoji} Hey ${randomNick}! ${text} ${randomEmoji}`;
+function showDay(dayIdx){
+  container.innerHTML = "";
+  const day = DAYS[dayIdx];
+  const card = document.createElement("div");
+  card.className="card";
+
+  const title = document.createElement("h2");
+  title.textContent = day.title;
+  card.appendChild(title);
+
+  day.questions.forEach((q,i)=>{
+    const qDiv = document.createElement("div");
+    qDiv.style.marginTop="15px";
+
+    const qText = document.createElement("div");
+    qText.textContent=q.q;
+    qText.style.fontWeight="700";
+    qDiv.appendChild(qText);
+
+    const msgDiv = document.createElement("div");
+    msgDiv.className="message";
+    qDiv.appendChild(msgDiv);
+
+    if(q.type==="choice"){
+      q.options.forEach(opt=>{
+        const btn = document.createElement("button");
+        btn.textContent=opt;
+        btn.addEventListener("click",()=>{
+          answers[`day${day.day}-${i}`]=opt;
+          msgDiv.textContent=chooseMessage();
+        });
+        qDiv.appendChild(btn);
+      });
+    }else if(q.type==="text"){
+      const input = document.createElement("input");
+      input.type="text";
+      input.style.padding="8px"; 
+      input.style.marginTop="5px"; 
+      input.style.borderRadius="8px"; 
+      input.style.width="100%";
+      input.addEventListener("input",()=>{
+        answers[`day${day.day}-${i}`]=input.value;
+        msgDiv.textContent=chooseMessage();
+      });
+      qDiv.appendChild(input);
+    }
+
+    card.appendChild(qDiv);
+  });
+
+  const navDiv = document.createElement("div");
+  navDiv.className="nav";
+
+  if(dayIdx>0){
+    const prevBtn = document.createElement("button");
+    prevBtn.textContent="⬅ Previous Day";
+    prevBtn.addEventListener("click",()=>{currentDay--; showDay(currentDay);});
+    navDiv.appendChild(prevBtn);
   }
+
+  if(dayIdx<DAYS.length-1){
+    const nextBtn = document.createElement("button");
+    nextBtn.textContent="Next Day ➡";
+    nextBtn.addEventListener("click",()=>{currentDay++; showDay(currentDay);});
+    navDiv.appendChild(nextBtn);
+  }else{
+    const finishBtn = document.createElement("button");
+    finishBtn.textContent="🎆 Celebrate!";
+    finishBtn.addEventListener("click",startFireworks);
+    navDiv.appendChild(finishBtn);
+  }
+
+  card.appendChild(navDiv);
+  container.appendChild(card);
 }
 
-// Export answers
-function exportAnswers(){
-  const data=JSON.stringify(answers,null,2);
-  const blob=new Blob([data],{type:'application/json'});
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement('a');
-  a.href=url;
-  a.download='pookie_answers.json';
-  a.click();
-  a.remove();
+/* ===========================
+   MESSAGE PICKER
+=========================== */
+function chooseMessage(){
+  const pool = Math.random()<0.6 ? PLAYFUL_MESSAGES : HEARTFELT_MESSAGES;
+  return pool[Math.floor(Math.random()*pool.length)];
 }
 
-// Init
-nextPage(0);
+/* ===========================
+   FIREWORKS
+=========================== */
+const fwCanvas=document.getElementById("fireworksCanvas");
+const fctx=fwCanvas.getContext("2d"); let W,H;
+function resizeFW(){ W=fwCanvas.width=window.innerWidth; H=fwCanvas.height=window.innerHeight; }
+resizeFW(); window.addEventListener("resize", resizeFW);
+
+let fw=[], parts=[];
+function R(min,max){ return Math.random()*(max-min)+min; }
+class FW{ constructor(){ this.x=R(W*0.2,W*0.8); this.y=H; this.ty=R(H*0.2,H*0.5); this.v=R(6,9); this.color=`hsl(${R(0,360)} 100% 60%)`; }
+  update(){ this.y-=this.v; if(this.y<=this.ty){ this.explode(); return true;} this.draw(); return false; }
+  draw(){ fctx.beginPath(); fctx.arc(this.x,this.y,3,0,Math.PI*2); fctx.fillStyle=this.color; fctx.fill(); }
+  explode(){ for(let i=0;i<70;i++) parts.push(new PART(this.x,this.y,this.color)); }
+}
+class PART{ constructor(x,y,c){ this.x=x; this.y=y; this.c=c; this.v=R(1,6); this.a=1; this.angle=R(0,Math.PI*2);}
+  update(){ this.x+=Math.cos(this.angle)*this.v; this.y+=Math.sin(this.angle)*this.v; this.v*=0.98; this.a-=0.02; this.draw(); return this.a<=0; }
+  draw(){ fctx.save(); fctx.globalAlpha=this.a; fctx.beginPath(); fctx.arc(this.x,this.y,3,0,Math.PI*2); fctx.fillStyle=this.c; fctx.fill(); fctx.restore(); }
+}
+function animateFW(){ fctx.clearRect(0,0,W,H); if(Math.random()<0.06) fw.push(new FW()); fw=fw.filter(x=>!x.update()); parts=parts.filter(p=>!p.update()); requestAnimationFrame(animateFW); }
+function startFireworks(){ fwCanvas.style.display='block'; animateFW(); }
+
+/* ===========================
+   INIT
+=========================== */
 </script>
 </body>
 </html>
